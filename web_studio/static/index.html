@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Zavod Platform • Web Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 1); }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .agent-card:hover {
+      background: rgba(30, 41, 59, 0.7);
+    }
+  </style>
+</head>
+<body class="bg-[#0b0f19] text-slate-100 min-h-screen font-sans flex flex-col antialiased selection:bg-indigo-500 selection:text-white overflow-hidden h-screen">
+
+  <!-- macOS Window Titlebar -->
+  <header class="h-9 bg-[#080c14] border-b border-slate-800/80 px-4 flex items-center justify-between select-none text-xs text-slate-400">
+    <div class="flex items-center space-x-2">
+      <div class="flex space-x-1.5 mr-3">
+        <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+        <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+        <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+      </div>
+      <span class="font-bold text-slate-300 flex items-center gap-1.5">
+        <i class="fa-solid fa-industry text-indigo-400"></i> aizavod
+      </span>
+      <span class="text-slate-600">|</span>
+      <span class="text-[11px] text-slate-400">AI-Zavod Platform v2.0 • OmniRoute Engine</span>
+    </div>
+    <div class="flex items-center space-x-4 text-[11px]">
+      <span id="res-badge" class="px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-800/40 text-emerald-400 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        RAM: <strong id="ram-usage">~38 MB</strong> • CPU: <strong id="cpu-usage">0.1%</strong>
+      </span>
+      <span class="text-slate-500">Gateway: <strong class="text-indigo-400">localhost:20128</strong></span>
+    </div>
+  </header>
+
+  <!-- 3-Column Main Workspace -->
+  <div class="flex-1 flex overflow-hidden">
+
+    <!-- Column 1: Projects & Quotas (Width: 260px) -->
+    <aside class="w-64 bg-[#0d1322] border-r border-slate-800/80 flex flex-col justify-between p-3 select-none">
+      <div class="space-y-4">
+        <!-- Brand & Add Agent -->
+        <div class="flex items-center justify-between pt-1">
+          <div class="flex items-center space-x-2">
+            <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center font-black text-xs text-white shadow-lg shadow-indigo-500/20">
+              AZ
+            </div>
+            <div>
+              <h2 class="text-xs font-bold text-white tracking-tight">AI Zavod Platform</h2>
+              <p class="text-[10px] text-emerald-400 flex items-center gap-1">
+                <span class="w-1 h-1 rounded-full bg-emerald-400"></span> 7 agents online
+              </p>
+            </div>
+          </div>
+          <button class="w-6 h-6 rounded-md bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 flex items-center justify-center text-xs transition" title="New Agent">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+
+        <!-- Project Search -->
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2 text-slate-500 text-xs"></i>
+          <input type="text" placeholder="Search projects..." class="w-full bg-[#131b2e] border border-slate-800 rounded-lg pl-7 pr-2.5 py-1 text-xs text-white focus:outline-none focus:border-indigo-500 transition" />
+        </div>
+
+        <!-- Projects Tree -->
+        <div class="space-y-1">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-2">Projects</div>
+          <div id="projects-list" class="space-y-0.5 text-xs max-h-60 overflow-y-auto">
+            <div class="p-2 rounded-lg bg-indigo-600/20 border border-indigo-500/30 text-indigo-200 font-medium flex items-center justify-between cursor-pointer">
+              <span class="truncate"><i class="fa-solid fa-folder-open text-indigo-400 mr-2"></i> All Projects</span>
+              <span class="text-[10px] px-1.5 py-0.2 rounded bg-indigo-500/30">Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Runtime Quota Meters -->
+      <div class="border-t border-slate-800/80 pt-3 space-y-2 text-[11px]">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 flex justify-between">
+          <span>Runtime Quotas</span>
+          <span class="text-indigo-400">OmniRoute</span>
+        </div>
+        <div class="space-y-1.5">
+          <div>
+            <div class="flex justify-between text-[10px] text-slate-400 mb-0.5">
+              <span>gemini-3.7-flash-high</span>
+              <span class="text-emerald-400 font-semibold">Active Primary (OAuth)</span>
+            </div>
+            <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+              <div class="bg-emerald-500 h-full w-full"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-[10px] text-slate-400 mb-0.5">
+              <span>claude-3-7-sonnet</span>
+              <span class="text-indigo-400 font-semibold">Fallback Active</span>
+            </div>
+            <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+              <div class="bg-indigo-500 h-full w-3/4"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-[10px] text-slate-400 mb-0.5">
+              <span>deepseek-v3</span>
+              <span class="text-purple-400 font-semibold">Tier-2 Standby</span>
+            </div>
+            <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+              <div class="bg-purple-500 h-full w-1/2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Column 2: Agent Roster & Status (Width: 320px) -->
+    <section class="w-80 bg-[#0f1629] border-r border-slate-800/80 flex flex-col select-none">
+      <!-- Search & Filters Header -->
+      <div class="p-3 border-b border-slate-800/80 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold text-white">Agents Roster</h3>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">7 Active</span>
+        </div>
+        <div class="flex items-center space-x-1 text-[11px]">
+          <button class="px-2 py-1 rounded bg-indigo-600 text-white font-medium">All 7</button>
+          <button class="px-2 py-1 rounded hover:bg-slate-800 text-slate-400">Active</button>
+          <button class="px-2 py-1 rounded hover:bg-slate-800 text-slate-400">Streaming</button>
+          <button class="px-2 py-1 rounded hover:bg-slate-800 text-slate-400">Idle</button>
+        </div>
+      </div>
+
+      <!-- Agents List -->
+      <div id="agents-list" class="flex-1 overflow-y-auto p-2 space-y-1.5">
+        <!-- Rendered via JavaScript -->
+      </div>
+    </section>
+
+    <!-- Column 3: Terminal Workspace & Execution Cards (Flex 1) -->
+    <main class="flex-1 bg-[#090d16] flex flex-col justify-between overflow-hidden relative">
+
+      <!-- Active Agent Workspace Header -->
+      <div class="h-14 border-b border-slate-800/80 px-5 flex items-center justify-between bg-[#0b0f1a]">
+        <div class="flex items-center space-x-3">
+          <span id="active-agent-avatar" class="text-2xl">🍊</span>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h2 id="active-agent-name" class="text-sm font-bold text-white">teamlead</h2>
+              <span class="text-[10px] px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-400 border border-indigo-800/50">#ai-zavod</span>
+              <span id="active-agent-model" class="text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-300">5.6-xxl</span>
+              <span id="active-stream-badge" class="text-[10px] text-emerald-400 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> idle
+              </span>
+            </div>
+            <p id="active-agent-role" class="text-[11px] text-slate-400 mt-0.5">Product Orchestrator & Multi-Agent Lead</p>
+          </div>
+        </div>
+
+        <!-- Collaborators Avatars -->
+        <div class="flex items-center space-x-2">
+          <div class="flex -space-x-1.5 overflow-hidden">
+            <span class="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center text-[9px] font-bold text-white border border-slate-900" title="Product Manager">PM</span>
+            <span class="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-[9px] font-bold text-white border border-slate-900" title="Architect">AR</span>
+            <span class="w-6 h-6 rounded-full bg-cyan-600 flex items-center justify-center text-[9px] font-bold text-white border border-slate-900" title="Backend">BK</span>
+            <span class="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center text-[9px] font-bold text-white border border-slate-900" title="DevOps">DO</span>
+          </div>
+          <button onclick="refreshData()" class="p-2 text-slate-400 hover:text-white transition" title="Refresh">
+            <i class="fa-solid fa-rotate text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Execution Log & Terminal Cards Stream -->
+      <div id="terminal-stream" class="flex-1 overflow-y-auto p-5 space-y-4 font-mono text-xs">
+        
+        <!-- Welcome Card -->
+        <div class="bg-[#101726] border border-slate-800/80 rounded-xl p-4 shadow-xl text-slate-300">
+          <div class="flex items-center justify-between text-indigo-400 font-bold mb-2">
+            <span class="flex items-center gap-2"><i class="fa-solid fa-terminal"></i> AI-Zavod Terminal Hub</span>
+            <span class="text-[10px] text-slate-500">READY</span>
+          </div>
+          <p class="text-slate-400 font-sans text-xs">
+            Добро пожаловать в веб-студию <strong>AI-Zavod Platform</strong>. Все 7 субагентов активны и подключены к шлюзу OmniRoute.
+          </p>
+          <div class="mt-3 flex gap-2">
+            <span class="px-2 py-1 bg-slate-900 rounded border border-slate-800 text-[11px] text-cyan-400">💡 [Consult]: Согласование PRD & Архитектуры</span>
+            <span class="px-2 py-1 bg-slate-900 rounded border border-slate-800 text-[11px] text-indigo-400">🚀 [Task]: Автономная генерация full-stack</span>
+          </div>
+        </div>
+
+        <!-- Sample Zsh Command Card -->
+        <div class="bg-[#0e1422] border border-slate-800 rounded-xl p-3.5 space-y-2">
+          <div class="flex items-center justify-between text-slate-400 text-[11px]">
+            <span class="flex items-center gap-1.5 text-indigo-300 font-bold">
+              <i class="fa-solid fa-bolt text-xs text-amber-400"></i> $/bin/zsh -lc 'omniroute healthcheck && pytest --version'
+            </span>
+            <span class="text-emerald-400 text-[10px] flex items-center gap-1">
+              <i class="fa-solid fa-check"></i> OK in 0.38s
+            </span>
+          </div>
+          <div class="bg-[#070a10] p-2.5 rounded-lg border border-slate-900 text-slate-300 font-mono text-[11px]">
+            [OmniRoute] Gateway connected on http://localhost:20128/v1 (498 models active)<br>
+            [Pytest] pytest 7.4.4 • Python 3.10.12 • All test runners verified
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Interactive Command & Prompt Box -->
+      <div class="border-t border-slate-800/80 p-4 bg-[#0c101c]">
+        <!-- Action Mode Toggle -->
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center space-x-2">
+            <button id="mode-consult-btn" onclick="setMode('consult')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-cyan-600/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-600/30 transition flex items-center gap-1.5">
+              <i class="fa-solid fa-lightbulb"></i> Consult Mode (Согласование)
+            </button>
+            <button id="mode-task-btn" onclick="setMode('task')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white border border-indigo-500 hover:bg-indigo-500 transition flex items-center gap-1.5">
+              <i class="fa-solid fa-rocket"></i> Task Mode (Сборка кода)
+            </button>
+            
+            <div class="h-4 w-[1px] bg-slate-800 mx-1"></div>
+            
+            <!-- Auto Mode Switcher -->
+            <button id="auto-mode-toggle" onclick="toggleAutoMode()" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-950/60 text-emerald-400 border border-emerald-800/50 hover:bg-emerald-900/60 transition flex items-center gap-1.5" title="Переключение между 100% автономом и пошаговыми правками разработчика">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span id="auto-mode-text">⚡ Авто-режим: ВКЛ (Zero-Touch)</span>
+            </button>
+          </div>
+          <span id="exec-status" class="text-[11px] text-slate-500">Ready for prompt</span>
+        </div>
+
+        <!-- Input Form -->
+        <form id="prompt-form" class="flex items-center space-x-2">
+          <div class="flex-1 relative">
+            <input id="prompt-input" type="text" placeholder="Опишите сайт или фичу для 7 агентов завода..." class="w-full bg-[#131b2e] border border-slate-700/80 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition" required />
+            <span class="absolute right-3 top-3 text-slate-500 text-xs">
+              <i class="fa-solid fa-microphone hover:text-indigo-400 cursor-pointer transition"></i>
+            </span>
+          </div>
+          <button type="submit" id="send-btn" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold px-5 py-3 rounded-xl text-xs shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 active:scale-95">
+            <span>Отправить</span>
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+          </button>
+        </form>
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
